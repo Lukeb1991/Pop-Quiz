@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pop Quiz – the daily music bubble puzzle</title>
+<meta name="description" content="Nine bubbles, one music question. Pop the right ones, but you never know how many. A new puzzle every day from Puzzl.">
+<meta name="theme-color" content="#0b0e1c">
+<!-- Link previews (WhatsApp, iMessage, socials). Swap the domain for your live address. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Puzzl">
+<meta property="og:title" content="Pop Quiz – pop the right bubbles">
+<meta property="og:description" content="Nine bubbles, one music question. Pop the right ones, but you never know how many.">
+<meta property="og:url" content="https://playpuzzl.com/Pop-Quiz/">
+<meta property="og:image" content="https://playpuzzl.com/Pop-Quiz/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🫧%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Pop Quiz palette: Puzzl navy, with bubblegum pink, aqua and a soap-film shimmer */
+  --night:#0a0d1d; --bg:#0a0d1d; --surface:#161a33; --surface-2:#20254a;
+  --line:rgba(125,211,252,.2); --line2:rgba(244,114,182,.45);
+  --text:#f4f6ff; --muted:#9aa3c7; --aqua:#5eead4; --sky:#7dd3fc; --gum:#f472b6; --lilac:#c4b5fd; --lemon:#fde68a;
+  --good:#34d399; --bad:#fb7185; --miss:#fbbf24;
+  --grad:linear-gradient(90deg,#7dd3fc,#c4b5fd 45%,#f472b6);
+  --round:'Fredoka','DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+  --sans:'DM Sans',system-ui,sans-serif;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+/* Puzzl is a dark brand: same palette whatever the viewer's theme */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0d1d;--text:#f4f6ff}}
+:root[data-theme="dark"]{--bg:#0a0d1d;--text:#f4f6ff}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;font-family:var(--sans);color:var(--text);-webkit-font-smoothing:antialiased;background-color:var(--night);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='460' fill='none' stroke='%23fff' stroke-opacity='.06' stroke-width='1.5'%3E%3Ccircle cx='60' cy='80' r='34'/%3E%3Ccircle cx='96' cy='126' r='12'/%3E%3Ccircle cx='310' cy='60' r='18'/%3E%3Ccircle cx='250' cy='250' r='46'/%3E%3Ccircle cx='300' cy='310' r='10'/%3E%3Ccircle cx='80' cy='360' r='22'/%3E%3Ccircle cx='360' cy='420' r='28'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 80% 40% at 20% -4%,rgba(125,211,252,.16),transparent 60%) fixed,
+    radial-gradient(ellipse 80% 40% at 85% -4%,rgba(244,114,182,.16),transparent 60%) fixed,var(--night);
+}
+html,body{overflow-x:hidden}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--gum);outline-offset:3px;border-radius:8px}
+
+.app{max-width:480px;margin:0 auto;padding:16px 16px 32px;overflow-x:clip}
+
+/* Shared Puzzl top bar */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:44px}
+.top .r{justify-self:end;display:flex;gap:8px}
+.icon{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--lemon);font:500 16px var(--mono);display:grid;place-items:center;cursor:pointer}
+.icon svg{width:15px;height:15px;fill:currentColor}
+.icon:hover{border-color:var(--line2)}
+#sound-btn svg{width:17px;height:17px;fill:none;stroke:currentColor}
+.kicker{font:500 12px var(--mono);letter-spacing:.3em;color:var(--aqua);text-transform:uppercase}
+
+/* Brand: bubbly wordmark and a floating bubble cluster */
+.emblem{width:76px;height:58px;margin:6px auto 0}
+.emblem svg{width:100%;height:100%;overflow:visible}
+.emblem .b1{animation:bob 3.4s ease-in-out infinite}
+.emblem .b2{animation:bob 2.8s ease-in-out infinite -1s}
+.emblem .b3{animation:bob 3.9s ease-in-out infinite -2s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+h1{font:700 58px/1 var(--round);text-align:center;margin-top:2px;letter-spacing:-.01em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(244,114,182,.25))}
+.sub{font:500 17px var(--round);color:var(--lemon);text-align:center;margin-top:6px;margin-bottom:18px}
+
+
+/* Status row */
+.status{display:flex;justify-content:space-between;align-items:center;font:500 12px var(--mono);letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.lives{display:flex;align-items:center;gap:6px}
+.pip{width:15px;height:15px;border-radius:50%;transition:transform .3s,opacity .3s;
+  background:radial-gradient(circle at 32% 30%,#fff 0 12%,rgba(255,255,255,.35) 13% 22%,transparent 23%),radial-gradient(circle at 50% 50%,rgba(125,211,252,.25),rgba(244,114,182,.55));
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.pip.lost{background:none;box-shadow:inset 0 0 0 1.5px rgba(251,113,133,.6);transform:scale(.7);opacity:.6}
+.score b{color:var(--text);font:600 22px var(--round);vertical-align:-2px;margin-left:4px}
+
+/* Question card */
+.qcard{position:relative;border-radius:20px;padding:16px 18px 18px;text-align:center;
+  background:linear-gradient(160deg,rgba(125,211,252,.12),rgba(244,114,182,.1)),var(--surface);border:1px solid var(--line);
+  box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.qmeta{display:flex;justify-content:space-between;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.qmeta .lvl{color:var(--aqua)}
+.question{font:600 clamp(1.15rem,4.9vw,1.4rem)/1.3 var(--round);color:var(--text)}
+.question em{font-style:normal;color:var(--gum)}
+
+/* The bubble grid */
+.tank{position:relative;margin:16px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bubble{position:relative;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;padding:12%;text-align:center;
+  animation:float var(--t,4s) ease-in-out infinite var(--dl,0s);touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:opacity .3s}
+.bubble .skin{position:absolute;inset:0;border-radius:50%;pointer-events:none;transition:transform .12s;
+  background:
+    radial-gradient(ellipse 17% 9% at 33% 22%,rgba(255,255,255,.85),rgba(255,255,255,0) 100%),
+    radial-gradient(ellipse 6% 4% at 72% 80%,rgba(255,255,255,.35),rgba(255,255,255,0) 100%),
+    radial-gradient(circle at 50% 50%,rgba(10,13,29,.15) 52%,rgba(125,211,252,.22) 72%,rgba(196,181,253,.3) 86%,rgba(244,114,182,.5) 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35),inset -6px -8px 18px rgba(244,114,182,.18),inset 6px 8px 18px rgba(125,211,252,.16),0 8px 22px rgba(0,0,0,.3)}
+.bubble .skin::after{ /* soap-film shimmer */
+  content:"";position:absolute;inset:0;border-radius:50%;opacity:.35;mix-blend-mode:screen;
+  background:conic-gradient(from 0deg,rgba(125,211,252,.0),rgba(125,211,252,.5),rgba(196,181,253,.0),rgba(244,114,182,.5),rgba(253,230,138,.3),rgba(125,211,252,.0));
+  -webkit-mask:radial-gradient(circle,transparent 62%,#000 72%);mask:radial-gradient(circle,transparent 62%,#000 72%);
+  animation:shimmer 6s linear infinite}
+@keyframes shimmer{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translate(0,0)}33%{transform:translate(1.5px,-4px)}66%{transform:translate(-1.5px,-2px)}}
+.bubble:active .skin{transform:scale(.94)}
+.bubble .t{position:relative;font:600 clamp(.72rem,3.3vw,.9rem)/1.15 var(--sans);color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);word-break:break-word;hyphens:auto}
+.bubble .a{display:block;font:500 clamp(.58rem,2.6vw,.7rem)/1.15 var(--sans);color:var(--lilac);margin-top:3px}
+.bubble.xs .t{font-size:clamp(.62rem,2.8vw,.76rem)}
+.bubble.big .t{font:700 clamp(1.4rem,7vw,1.9rem) var(--round)}
+/* After a pop the bubble is gone; a ghost ring keeps the grid readable */
+.bubble.gone{animation:none}
+.bubble.gone .skin{animation:burst .28s ease-out forwards}
+@keyframes burst{0%{transform:scale(1);opacity:1}40%{transform:scale(1.18);opacity:.9}100%{transform:scale(1.45);opacity:0}}
+.bubble.gone::before{content:"";position:absolute;inset:6%;border-radius:50%;border:2px dashed rgba(94,234,212,.55);animation:ghostIn .4s .15s both}
+.bubble.gone .t{opacity:.55}
+.bubble.gone.bad::before{border:2px solid rgba(251,113,133,.75);background:radial-gradient(circle,rgba(251,113,133,.18),transparent 70%)}
+.bubble.gone.bad .t{opacity:.85;text-decoration:line-through;text-decoration-color:rgba(251,113,133,.9)}
+@keyframes ghostIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.bubble:disabled{cursor:default}
+/* Review: missed ones glow and wobble; correctly-ignored ones fade back */
+.bubble.missed .skin{box-shadow:inset 0 0 0 2.5px var(--miss),0 0 18px rgba(251,191,36,.45)}
+.bubble.missed{animation:wobble .5s ease-in-out 2}
+.bubble.kept .skin{box-shadow:inset 0 0 0 2.5px rgba(52,211,153,.8),0 0 16px rgba(52,211,153,.3)}
+@keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.tag{position:absolute;top:-2px;right:-2px;z-index:3;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--sans);box-shadow:0 2px 8px rgba(0,0,0,.4);animation:pop .3s ease-out}
+.tag.ok{background:var(--good);color:#06281d}.tag.no{background:var(--bad);color:#3b0712}.tag.mi{background:var(--miss);color:#3b2603}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+
+/* Pop effects */
+.fx{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:10}
+.fx .ring{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;border:3px solid var(--c,#7dd3fc);animation:ring .45s ease-out forwards}
+@keyframes ring{from{transform:scale(.4);opacity:1}to{transform:scale(2.3);opacity:0;border-width:1px}}
+.fx .drop{position:absolute;left:-4px;top:-4px;width:var(--s,8px);height:var(--s,8px);border-radius:50%;background:var(--c,#7dd3fc);
+  animation:fly .6s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes fly{from{transform:rotate(var(--a)) translateX(10px) scale(1);opacity:1}to{transform:rotate(var(--a)) translateX(var(--d)) translateY(14px) scale(.3);opacity:0}}
+.fx .word{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font:700 26px var(--round);color:var(--c,#fff);white-space:nowrap;
+  text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px var(--c,#fff);animation:word .7s ease-out forwards}
+@keyframes word{0%{transform:translate(-50%,-50%) scale(.4) rotate(-8deg);opacity:0}25%{transform:translate(-50%,-80%) scale(1.15) rotate(-4deg);opacity:1}100%{transform:translate(-50%,-160%) scale(1) rotate(0);opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+
+/* Buttons and messages */
+.btn{height:52px;border-radius:999px;padding:0 22px;font:600 16px var(--round);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;touch-action:manipulation;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(90deg,#38bdf8,#a78bfa 50%,#f472b6);color:#fff;box-shadow:0 8px 24px rgba(244,114,182,.3)}
+.btn-ghost{background:transparent;border:1.5px solid var(--line2);color:var(--lemon)}
+.btn-block{width:100%;margin-top:12px}
+.hint{text-align:center;font:500 12px/1.5 var(--mono);color:var(--muted);margin-top:8px}
+.feedback{min-height:22px;text-align:center;margin-top:10px;font:600 15px var(--round)}
+.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}.feedback.mid{color:var(--lemon)}
+.fact{margin-top:10px;padding:12px 14px;border-radius:16px;background:rgba(0,0,0,.2);border:1px solid var(--line);font:400 14px/1.5 var(--sans);color:var(--muted)}
+.legend{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;font:500 11px var(--sans);color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.c-g{background:var(--aqua)}.c-k{background:rgba(255,255,255,.16)}.c-b{background:var(--bad)}.c-m{background:var(--miss)}
+.hidden{display:none!important}
+
+/* End screen */
+.end{position:relative;text-align:center;border-radius:24px;padding:24px 20px 26px;
+  background:radial-gradient(ellipse 80% 45% at 50% 0%,rgba(244,114,182,.18),transparent 70%),linear-gradient(170deg,#20254a,#161a33 60%,#1d1838);border:1px solid var(--line)}
+.end .stamp{font:500 11px var(--mono);letter-spacing:.2em;color:var(--aqua);text-transform:uppercase}
+.end h2{font:700 2.1rem/1.1 var(--round);margin-top:8px}
+.end-score{font:700 78px/1 var(--round);margin:10px 0 2px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.minis{display:flex;justify-content:center;gap:16px;margin:20px 0 6px}
+.mini{display:grid;grid-template-columns:repeat(3,18px);gap:4px}
+.mini i{width:18px;height:18px;border-radius:50%}
+.mini-l{font:500 10px var(--mono);color:var(--muted);margin-top:6px;letter-spacing:.06em}
+.end-sub{color:var(--muted);font:500 12px var(--mono);letter-spacing:.08em}
+.end-actions{display:flex;gap:8px;margin-top:20px}
+.end-actions .btn{flex:1}
+.next-wrap{margin-top:22px;padding-top:18px;border-top:2px dashed rgba(255,255,255,.12)}
+.next-label{font:500 13px var(--mono);color:var(--muted)}
+.countdown{font:500 26px var(--mono);letter-spacing:.06em;margin-top:4px;color:var(--lemon)}
+.recap{text-align:left;margin-top:22px}
+.recap h3{font:600 1.2rem var(--round);margin-bottom:10px}
+.recap ol{list-style:none;display:grid;gap:8px}
+.recap li{padding:12px 14px;border-radius:16px;background:rgba(0,0,0,.25)}
+.recap .rq{font:600 .98rem/1.3 var(--round)}
+.recap .ra{font:400 13px/1.45 var(--sans);color:var(--text);margin-top:4px}
+.recap .ra b{color:var(--aqua);font-weight:600}
+.recap .rnote{font-size:.76rem;color:var(--muted);margin-top:4px;font-style:italic}
+.recap .rs{float:right;font:700 .95rem var(--round);color:var(--lemon);margin-left:8px}
+
+/* Dialogs */
+dialog{margin:auto;max-width:420px;width:calc(100% - 40px);max-height:calc(100% - 40px);overflow:auto;background:var(--surface);color:var(--text);
+  border:1px solid var(--line);border-radius:20px;padding:22px;position:fixed;animation:in .3s ease both}
+dialog::backdrop{background:rgba(5,6,14,.8)}
+dialog h2{font:700 28px var(--round);margin-bottom:12px}
+dialog p{font:400 15px/1.55 var(--sans);color:#d9def5;margin-bottom:10px}
+dialog p strong{color:var(--text)}
+.close{position:absolute;top:12px;right:12px}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rule{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.2);margin:6px 0;font:500 14px/1.4 var(--sans);color:#d9def5}
+.rule .ic{flex:none;width:26px;text-align:center;font-size:18px}
+.opt{display:flex;align-items:center;gap:10px;margin-top:14px;font:500 14px var(--sans);color:var(--muted);cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--gum)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;margin:8px 0 16px}
+.stat b{display:block;font:600 30px var(--round);color:var(--text)}
+.stat span{font:500 10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.statlab{font:500 11px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.dbar{display:flex;align-items:center;gap:8px;margin:5px 0;font:500 13px var(--mono)}
+.dbar span{width:12px}
+.dbar i{display:block;height:20px;min-width:24px;border-radius:999px;background:var(--surface-2);font-style:normal;text-align:right;padding-right:8px;line-height:20px}
+.dbar i.hl{background:linear-gradient(90deg,#38bdf8,#f472b6)}
+.foot{text-align:center;font:400 12px var(--mono);color:var(--muted);margin-top:28px}
+.foot b{color:#fff;font-weight:500}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--lemon);color:var(--night);font:700 14px var(--sans);padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.fade-in{animation:in .35s ease both}
+/* Hidden switch used to trigger the iPhone's haptic tick */
+.hap{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <button class="icon" id="help-btn" aria-label="How to play">?</button>
+    <span class="kicker" id="kicker">Quiz No. 1</span>
+    <div class="r">
+      <button class="icon" id="sound-btn" aria-label="Sound on" aria-pressed="true"></button>
+      <button class="icon" id="stats-btn" aria-label="Your stats"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="8" width="3" height="7" rx="1"/><rect x="6.5" y="4" width="3" height="11" rx="1"/><rect x="12" y="1" width="3" height="14" rx="1"/></svg></button>
+    </div>
+  </div>
+
+  <div class="emblem" aria-hidden="true">
+    <svg viewBox="0 0 76 58">
+      <defs>
+        <radialGradient id="bg1" cx="50%" cy="50%" r="50%"><stop offset="55%" stop-color="#0a0d1d" stop-opacity="0"/><stop offset="80%" stop-color="#7dd3fc" stop-opacity=".35"/><stop offset="100%" stop-color="#f472b6" stop-opacity=".75"/></radialGradient>
+      </defs>
+      <g class="b1"><circle cx="28" cy="32" r="20" fill="url(#bg1)" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/><ellipse cx="21" cy="24" rx="5" ry="3" fill="#fff" opacity=".85" transform="rotate(-30 21 24)"/></g>
+      <g class="b2"><circle cx="58" cy="20" r="12" fill="url(#bg1)" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/><ellipse cx="54" cy="15" rx="3" ry="2" fill="#fff" opacity=".85" transform="rotate(-30 54 15)"/></g>
+      <g class="b3"><circle cx="60" cy="46" r="7" fill="url(#bg1)" stroke="#fff" stroke-opacity=".6" stroke-width="1.2"/><circle cx="58" cy="43.5" r="1.5" fill="#fff" opacity=".85"/></g>
+    </svg>
+  </div>
+  <h1>Pop Quiz</h1>
+  <p class="sub">Pop the right bubbles. But how many?</p>
+
+  <section id="play" class="hidden">
+    <div class="status">
+      <div class="lives" aria-label="Lives left"><span>Lives</span><span id="lives" class="lives"></span></div>
+      <div class="score">Score <b id="score">0</b></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qmeta"><span id="round">Round 1 of 3</span><span class="lvl" id="level">Warm-up</span></div>
+      <p class="question" id="question"></p>
+    </div>
+
+    <div class="tank" id="tank">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="done-btn">Done popping</button>
+    <p class="hint" id="hint">Could be 2 to pop, could be 7. Your call.</p>
+    <p class="feedback" id="feedback" aria-live="polite"></p>
+    <div class="legend hidden" id="legend">
+      <span><i class="c-g"></i>Popped right</span><span><i style="box-shadow:inset 0 0 0 2px #34d399"></i>Rightly kept</span>
+      <span><i class="c-b"></i>Wrong pop</span><span><i class="c-m"></i>Missed</span>
+    </div>
+    <div class="fact hidden" id="fact"></div>
+    <button class="btn btn-primary btn-block hidden" id="next-btn">Next round</button>
+  </section>
+
+  <section id="end" class="end hidden">
+    <div class="stamp" id="end-stamp">Quiz No. 1</div>
+    <h2 id="end-title">Bubble trouble</h2>
+    <div class="end-score" id="end-score">0</div>
+    <p class="end-sub">out of 27</p>
+    <div class="minis" id="minis"></div>
+    <div class="end-actions">
+      <button class="btn btn-primary" id="share-img">Share image</button>
+      <button class="btn btn-ghost" id="copy-btn">Copy result</button>
+    </div>
+    <div class="next-wrap">
+      <div class="next-label">Fresh bubbles in</div>
+      <div class="countdown" id="countdown">--:--:--</div>
+    </div>
+    <div class="recap">
+      <h3>Today's answers</h3>
+      <ol id="recap"></ol>
+    </div>
+  </section>
+
+  <footer class="foot">A new daily music puzzle from <b>Puzzl</b></footer>
+</main>
+
+<dialog id="help">
+  <button class="icon close" data-close aria-label="Close">✕</button>
+  <h2>How to play</h2>
+  <p>Three rounds a day. Each one has a <strong>music question and nine bubbles</strong>. Pop every bubble that fits.</p>
+  <p>The catch: <strong>you're never told how many</strong>. It could be two, it could be seven. When you think you've got them all, hit <strong>Done popping</strong>.</p>
+  <p>You get <strong>3 lives</strong> each round. Every wrong pop costs one, and losing all three ends the round.</p>
+  <p>Every bubble scores a point if you got it right, popped or left alone. That's 9 a round, 27 a day. New puzzle at 7am UK time.</p>
+  <div class="legend"><span><i class="c-g"></i>Popped right</span><span><i style="box-shadow:inset 0 0 0 2px #34d399"></i>Rightly kept</span><span><i class="c-b"></i>Wrong pop</span><span><i class="c-m"></i>Missed</span></div>
+  <label class="opt" id="haptics-row"><input type="checkbox" id="haptics-opt" checked> Vibrate on pops</label>
+  <button class="btn btn-primary btn-block" id="help-close">Let's pop</button>
+</dialog>
+
+<dialog id="stats">
+  <button class="icon close" data-close aria-label="Close">✕</button>
+  <h2>Your stats</h2>
+  <div class="stats-grid">
+    <div class="stat"><b id="st-played">0</b><span>Played</span></div>
+    <div class="stat"><b id="st-streak">0</b><span>Streak</span></div>
+    <div class="stat"><b id="st-best">0</b><span>Best</span></div>
+    <div class="stat"><b id="st-avg">0</b><span>Avg</span></div>
+  </div>
+  <div class="statlab">Perfect rounds per day</div>
+  <div id="dist"></div>
+  <p style="margin-top:14px">Top score <strong id="st-top">0</strong> of 27. Fresh bubbles in <strong id="st-countdown">--:--:--</strong></p>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+<label class="hap" id="hap" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
+
+<script>
+/* ================= Settings ================= */
+const SITE_URL = 'https://playpuzzl.com/Pop-Quiz/';   // ← your live address (used in the share text)
+const RESET_HOUR = 7;                                  // ← new puzzle each day at this hour, UK time
+const LAUNCH   = '2026-10-21';                         // ← date of puzzle #1 (UK time)
+const PER_DAY = 3, LIVES = 3, PER_ROUND = 9;
+const LEVELS = ['Warm-up','Tricky','Brain-teaser'];
+
+/* Round helper: q(question, nine bubbles, fact shown afterwards).
+   A bubble is "Title" or "Title|Artist". Start it with * if it SHOULD be popped. */
+const q = (question, items, fact='') => ({question, fact, items: items.map(raw=>{
+  const target = raw[0]==='*'; const [title, artist=''] = (target?raw.slice(1):raw).split('|');
+  return {title, artist, target};
+})});
+
+/* Each day runs warm-up → tricky → brain-teaser, with three different kinds of question.
+   Day 1 is LAUNCH; after the last day it loops. */
+const DAYS = [
+  // Day 1
+  [ q("Pop every act that <em>isn't</em> British", ["The Beatles","*Boyzone","*The Corrs","Blur","The Clash","*Bon Jovi","Genesis","The Fratellis","*ABBA"],
+      "Boyzone and The Corrs are Irish, Bon Jovi are American and ABBA are Swedish. The Fratellis are from Glasgow."),
+    q("Pop every act that has headlined Glastonbury's <em>Pyramid Stage</em>", ["*Beyoncé","*Stormzy","Taylor Swift","*Kendrick Lamar","Kylie Minogue","*Adele","*Jay-Z","Dolly Parton","*Dua Lipa"],
+      "Taylor Swift was booked to headline in 2020, the year the festival was cancelled. Kylie was booked for 2005 but had to pull out."),
+    q("Pop every hit that was a cover of a <em>Bob Dylan</em> song", ["*All Along the Watchtower|Jimi Hendrix","Hallelujah|Jeff Buckley","*Make You Feel My Love|Adele","Respect|Aretha Franklin","*Knockin' on Heaven's Door|Guns N' Roses","Hurt|Johnny Cash","*Mr. Tambourine Man|The Byrds","Red Red Wine|UB40","Higher Love|Kygo & Whitney Houston"],
+      "The others: Hallelujah is Leonard Cohen's, Respect is Otis Redding's, Hurt is Nine Inch Nails', Red Red Wine is Neil Diamond's and Higher Love is Steve Winwood's.") ],
+  // Day 2
+  [ q("Pop every <em>Bob Marley</em> song", ["*No Woman, No Cry","Red Red Wine","*Three Little Birds","Israelites","*Redemption Song","It Wasn't Me","*One Love","Here Comes the Hotstepper","*Buffalo Soldier"],
+      "Red Red Wine was a hit for UB40, Israelites for Desmond Dekker, It Wasn't Me for Shaggy and Hotstepper for Ini Kamoze."),
+    q("Pop every act that has <em>won Eurovision</em>", ["*ABBA","*Céline Dion","Olivia Newton-John","*Måneskin","Cliff Richard","*Lordi","*Conchita Wurst","Sam Ryder","*Bucks Fizz"],
+      "Céline Dion won for Switzerland in 1988. Cliff lost by a single point in 1968."),
+    q("Pop every band that was <em>made up</em> for a film", ["*Spinal Tap","Hootie & the Blowfish","*The Commitments","Toad the Wet Sprocket","Ned's Atomic Dustbin","*Wyld Stallyns","Half Man Half Biscuit","The Lemonheads","Crash Test Dummies"],
+      "Spinal Tap, The Commitments and Bill & Ted's Wyld Stallyns are fictional. The rest are real bands. Honestly.") ],
+  // Day 3
+  [ q("Pop every <em>ABBA</em> song", ["*Dancing Queen","*Waterloo","Rasputin","*Mamma Mia","*SOS","Rivers of Babylon","*Fernando","*Take a Chance on Me","*Super Trouper"],
+      "Rasputin and Rivers of Babylon are Boney M, who were based in Germany."),
+    q("Pop everyone who was in <em>Destiny's Child</em>", ["*Beyoncé","*Kelly Rowland","T-Boz","*Michelle Williams","Nicole Scherzinger","Chilli","*LeToya Luckett","Fergie","Left Eye"],
+      "LeToya Luckett was an original member. T-Boz, Chilli and Left Eye were TLC."),
+    q("Pop every hit that was a <em>cover</em> of someone else's song", ["*Tainted Love|Soft Cell","*I Will Always Love You|Whitney Houston","Someone Like You|Adele","*Mad World|Gary Jules","Running Up That Hill|Kate Bush","*Hallelujah|Jeff Buckley","*Valerie|Mark Ronson & Amy Winehouse","Creep|Radiohead","*Nothing Compares 2 U|Sinéad O'Connor"],
+      "The originals: Gloria Jones, Dolly Parton, Tears for Fears, Leonard Cohen, The Zutons, and The Family, a Prince side project.") ],
+  // Day 4
+  [ q("Pop every song <em>Max Martin</em> co-wrote", ["*...Baby One More Time|Britney Spears","Bad Guy|Billie Eilish","*I Want It That Way|Backstreet Boys","Rolling in the Deep|Adele","*Blinding Lights|The Weeknd","Umbrella|Rihanna","*Shake It Off|Taylor Swift","Uptown Funk|Mark Ronson & Bruno Mars","*It's My Life|Bon Jovi"],
+      "The Swedish songwriter has more US No.1s to his name than anyone except Paul McCartney and John Lennon."),
+    q("Pop every act that has headlined the <em>Super Bowl</em> half-time show", ["*Prince","Taylor Swift","*Rihanna","*Shakira","Adele","*The Weeknd","Ed Sheeran","*Michael Jackson","Harry Styles"],
+      "Shakira co-headlined with Jennifer Lopez in 2020. Michael Jackson's 1993 show is the one that made it a headline gig."),
+    q("Pop every <em>Pink Floyd</em> album", ["*The Dark Side of the Moon","Rumours","*The Wall","Physical Graffiti","*Wish You Were Here","Tubular Bells","*Animals","Led Zeppelin IV","Who's Next"],
+      "Rumours is Fleetwood Mac, Physical Graffiti and IV are Led Zeppelin, Tubular Bells is Mike Oldfield and Who's Next is The Who.") ],
+  // Day 5
+  [ q("Pop every <em>Shakira</em> song", ["*Hips Don't Lie","Despacito","*Whenever, Wherever","Livin' la Vida Loca","*Waka Waka (This Time for Africa)","Bailando","*She Wolf","Macarena","La Bamba"],
+      "Despacito is Luis Fonsi, Livin' la Vida Loca is Ricky Martin, Bailando is Enrique Iglesias, Macarena is Los del Río and La Bamba is Ritchie Valens."),
+    q("Pop every star who uses a <em>stage name</em>", ["*Elton John","Adele","*Freddie Mercury","*Sting","Ed Sheeran","*Bruno Mars","*Lady Gaga","*Bono","*Lorde"],
+      "Real names: Reginald Dwight, Farrokh Bulsara, Gordon Sumner, Peter Hernandez, Stefani Germanotta, Paul Hewson and Ella Yelich-O'Connor."),
+    q("Pop every UK <em>Christmas No.1</em>", ["*Mr Blobby|Mr Blobby","Fairytale of New York|The Pogues","*Last Christmas|Wham!","*Bohemian Rhapsody|Queen","All I Want for Christmas Is You|Mariah Carey","*Killing in the Name|Rage Against the Machine","*Stay Another Day|East 17","I Wish It Could Be Christmas Everyday|Wizzard","*Lonely This Christmas|Mud"],
+      "Last Christmas finally got there in 2023, 39 years after it came out. Fairytale of New York stalled at No.2.") ],
+  // Day 6
+  [ q("Pop every <em>fake</em> Spice Girls nickname", ["Sporty","*Sassy","Scary","*Cheeky","Baby","*Funky","Ginger","*Glitzy","Posh"],
+      "Five Spice Girls, five nicknames: Sporty, Scary, Baby, Ginger and Posh."),
+    q("Pop every hit by an <em>African</em> artist", ["*Essence|Wizkid","Africa|Toto","*Last Last|Burna Boy","*Water|Tyla","Under African Skies|Paul Simon","*Calm Down|Rema","*Jerusalema|Master KG","Diamonds from Sierra Leone|Kanye West","*Pata Pata|Miriam Makeba"],
+      "Wizkid, Burna Boy and Rema are Nigerian. Tyla, Master KG and Miriam Makeba are South African. Toto were from LA."),
+    q("Pop every hit that started life in <em>another language</em>", ["*My Way|Frank Sinatra","Take On Me|a-ha","*Seasons in the Sun|Terry Jacks","Barbie Girl|Aqua","*It's Now or Never|Elvis Presley","The Final Countdown|Europe","*The Lion Sleeps Tonight|The Tokens","Hooked on a Feeling|Blue Swede","*Volare|Dean Martin"],
+      "My Way was French (Comme d'habitude), Seasons in the Sun was Jacques Brel, It's Now or Never is 'O Sole Mio', and The Lion Sleeps Tonight began as the Zulu song Mbube.") ],
+  // Day 7
+  [ q("Pop every <em>Coldplay</em> song", ["*Yellow","*Fix You","Chasing Cars","*Viva la Vida","Somewhere Only We Know","*Paradise","*The Scientist","*Clocks","*Speed of Sound"],
+      "Chasing Cars is Snow Patrol. Somewhere Only We Know is Keane."),
+    q("Pop every song from <em>Dirty Dancing</em>", ["*(I've Had) The Time of My Life","Take My Breath Away","*Hungry Eyes","Footloose","*She's Like the Wind","*Be My Baby","Danger Zone","*Do You Love Me","Flashdance... What a Feeling"],
+      "Take My Breath Away and Danger Zone are from Top Gun. She's Like the Wind was sung by the film's star, Patrick Swayze."),
+    q("Pop everyone who was <em>never</em> a Rolling Stone", ["Mick Jagger","Keith Richards","*Eric Clapton","Charlie Watts","Ronnie Wood","*Rod Stewart","Bill Wyman","*Pete Townshend","Brian Jones"],
+      "Brian Jones founded the band. Ronnie Wood joined in 1975 from the Faces, where he played with Rod Stewart.") ],
+  // Day 8
+  [ q("Pop every official <em>FIFA World Cup</em> song", ["*Waka Waka (This Time for Africa)|Shakira","Seven Nation Army|The White Stripes","*La Copa de la Vida|Ricky Martin","Freed from Desire|Gala","*We Are One (Ole Ola)|Pitbull, J.Lo & Claudia Leitte","Wavin' Flag|K'naan","*Live It Up|Nicky Jam, Will Smith & Era Istrefi","Sweet Caroline|Neil Diamond","We Will Rock You|Queen"],
+      "Wavin' Flag was Coca-Cola's anthem for the 2010 World Cup. The official song was Waka Waka."),
+    q("Pop every act that played <em>Live Aid</em> in 1985", ["*Queen","*U2","Michael Jackson","*David Bowie","*Status Quo","Prince","*Madonna","*Phil Collins","*Led Zeppelin"],
+      "Phil Collins played both shows, flying from London to Philadelphia on Concorde."),
+    q("Pop every song that <em>did</em> reach No.1 in the UK", ["*Shaddap You Face|Joe Dolce","Vienna|Ultravox","*Teletubbies say \"Eh-oh!\"|Teletubbies","Penny Lane|The Beatles","Starman|David Bowie","*Can We Fix It?|Bob the Builder","Smells Like Teen Spirit|Nirvana","Mr Blue Sky|ELO","Common People|Pulp"],
+      "Vienna was kept off No.1 by Shaddap You Face. Penny Lane was blocked by Engelbert Humperdinck.") ],
+  // Day 9
+  [ q("Pop every <em>Beyoncé</em> song", ["*Halo","Umbrella","*Single Ladies","Rude Boy","Diamonds","Poker Face","Toxic","Work","Bad Romance"],
+      "Umbrella, Rude Boy, Diamonds and Work are Rihanna. Toxic is Britney. Poker Face and Bad Romance are Lady Gaga."),
+    q("Pop every star who was found on a <em>TV talent show</em>", ["*Kelly Clarkson","Adele","*Little Mix","*One Direction","Dua Lipa","*Susan Boyle","*Carrie Underwood","Taylor Swift","*Leona Lewis"],
+      "Kelly Clarkson and Carrie Underwood won American Idol. Susan Boyle came second on Britain's Got Talent."),
+    q("Pop every <em>Taylor Swift</em> album", ["*Fearless","Lemonade","*Red","Sour","*Reputation","Future Nostalgia","*Folklore","Short n' Sweet","*Midnights"],
+      "Lemonade is Beyoncé, Sour is Olivia Rodrigo, Future Nostalgia is Dua Lipa and Short n' Sweet is Sabrina Carpenter.") ],
+  // Day 10
+  [ q("Pop every <em>Whitney Houston</em> song", ["*I Wanna Dance with Somebody","Hero","*I Will Always Love You","My Heart Will Go On","*How Will I Know","Vision of Love","We Belong Together","Think Twice","Fantasy"],
+      "Hero, Vision of Love, We Belong Together and Fantasy are Mariah Carey. My Heart Will Go On and Think Twice are Céline Dion."),
+    q("Pop every <em>K-pop</em> act", ["*BTS","*Blackpink","Babymetal","*PSY","*Twice","Fifth Harmony","*Stray Kids","*Seventeen","*NewJeans"],
+      "Babymetal are from Japan. Fifth Harmony were put together on the US X Factor."),
+    q("Pop every song <em>Prince</em> wrote", ["*Nothing Compares 2 U|Sinéad O'Connor","*Manic Monday|The Bangles","*I Feel for You|Chaka Khan","*Kiss|Tom Jones & Art of Noise","Ain't Nobody|Chaka Khan","Girls Just Want to Have Fun|Cyndi Lauper","Like a Prayer|Madonna","Eternal Flame|The Bangles","Total Eclipse of the Heart|Bonnie Tyler"],
+      "Prince wrote Manic Monday under the name Christopher. Ain't Nobody was written by David Wolinski of Rufus.") ],
+  // Day 11
+  [ q("Pop every <em>Kylie</em> song", ["*Can't Get You Out of My Head","*Spinning Around","Toxic","*I Should Be So Lucky","Murder on the Dancefloor","*Padam Padam","*Better the Devil You Know","Groovejet","Pure Shores"],
+      "Murder on the Dancefloor and Groovejet both feature Sophie Ellis-Bextor. Pure Shores is All Saints."),
+    q("Pop everyone who was <em>never</em> in Take That", ["Gary Barlow","Robbie Williams","*Ronan Keating","Mark Owen","*Shane Filan","Howard Donald","*Lee Ryan","Jason Orange","*Brian McFadden"],
+      "Ronan was Boyzone, Shane and Brian were Westlife, and Lee Ryan was in Blue."),
+    q("Pop every song that <em>won the Oscar</em> for Best Original Song", ["*Lose Yourself|Eminem","Happy|Pharrell Williams","*Naatu Naatu|from RRR","Eye of the Tiger|Survivor","*Shallow|Lady Gaga & Bradley Cooper","I Don't Want to Miss a Thing|Aerosmith","Footloose|Kenny Loggins","Ghostbusters|Ray Parker Jr.","Stayin' Alive|Bee Gees"],
+      "Naatu Naatu, from the Indian film RRR, won in 2023. Happy lost to Let It Go. Stayin' Alive wasn't even nominated.") ],
+  // Day 12
+  [ q("Pop every star who has had a <em>Las Vegas residency</em>", ["*Céline Dion","Taylor Swift","*Britney Spears","*Elvis Presley","Ed Sheeran","*Lady Gaga","*Usher","Rihanna","*Katy Perry"],
+      "Céline Dion's first residency ran for five years at Caesars Palace. Elvis played over 600 shows in Vegas."),
+    q("Pop every star <em>born in Latin America</em>", ["*Shakira","Rosalía","*Camila Cabello","Jennifer Lopez","*Anitta","Enrique Iglesias","*J Balvin","Selena Gomez","*Gloria Estefan"],
+      "Camila Cabello and Gloria Estefan were both born in Havana. Rosalía and Enrique are Spanish. J.Lo and Selena are American."),
+    q("Pop every star who played Glastonbury's Sunday <em>Legends</em> slot", ["*Dolly Parton","Elton John","*Kylie Minogue","Paul McCartney","*Diana Ross","Stevie Wonder","*Shania Twain","Beyoncé","Adele"],
+      "Elton John, Paul McCartney, Stevie Wonder, Beyoncé and Adele all got proper headline slots instead.") ],
+  // Day 13
+  [ q("Pop every <em>Queen</em> song", ["*Bohemian Rhapsody","Livin' on a Prayer","*Don't Stop Me Now","Sweet Child o' Mine","*Radio Ga Ga","Highway to Hell","*Killer Queen","Paradise City","The Final Countdown"],
+      "The rest are Bon Jovi, Guns N' Roses, AC/DC and Europe."),
+    q("Pop every <em>duo</em>", ["*Daft Punk","Busted","*Simon & Garfunkel","*The White Stripes","Muse","*Eurythmics","*Pet Shop Boys","Bee Gees","*Wham!"],
+      "Busted, Muse and the Bee Gees are all trios."),
+    q("Pop every song <em>Paul McCartney</em> wrote", ["*Yesterday","Imagine","*Hey Jude","Here Comes the Sun","*Live and Let Die","Something","*Let It Be","Starman","*Mull of Kintyre"],
+      "Imagine is John Lennon's. Here Comes the Sun and Something are George Harrison's.") ],
+  // Day 14
+  [ q("Pop every <em>Elton John</em> song", ["*Rocket Man","Space Oddity","*Your Song","*Tiny Dancer","Starman","*I'm Still Standing","*Crocodile Rock","Life on Mars?","*Candle in the Wind"],
+      "The space-themed decoys are all David Bowie."),
+    q("Pop every act signed to <em>Motown</em>", ["*The Supremes","Aretha Franklin","*The Temptations","*Marvin Gaye","Otis Redding","*Stevie Wonder","*The Jackson 5","James Brown","Whitney Houston"],
+      "Aretha was on Atlantic, Otis on Stax, James Brown on King and Whitney on Arista."),
+    q("Pop everyone who was <em>never</em> a Beatle", ["John Lennon","Paul McCartney","*Brian Epstein","George Harrison","Ringo Starr","Pete Best","Stuart Sutcliffe","*George Martin","*Billy Preston"],
+      "Pete Best drummed until 1962 and Stuart Sutcliffe played bass in Hamburg. Epstein was the manager, Martin the producer, Preston a guest on keys.") ],
+  // Day 15
+  [ q("Pop every star who was in Disney's <em>Mickey Mouse Club</em>", ["*Britney Spears","Beyoncé","*Justin Timberlake","Miley Cyrus","*Christina Aguilera","Lady Gaga","*Ryan Gosling","Selena Gomez","Katy Perry"],
+      "Miley and Selena were Disney Channel stars, but never in the Mickey Mouse Club. Ryan Gosling was, though."),
+    q("Pop every <em>James Bond theme</em>", ["*Skyfall","*Goldfinger","Purple Rain","*Live and Let Die","*Diamonds Are Forever","*GoldenEye","Bad Guy","*Writing's on the Wall","*No Time to Die"],
+      "GoldenEye was written for Tina Turner by Bono and The Edge."),
+    q("Pop every <em>Adele</em> album", ["*19","1989","*21","4","*25","1999","*30","÷","×"],
+      "1989 is Taylor Swift, 4 is Beyoncé, 1999 is Prince, and the maths symbols are Ed Sheeran.") ],
+  // Day 16
+  [ q("Pop every <em>Arctic Monkeys</em> song", ["*I Bet You Look Good on the Dancefloor","*Do I Wanna Know?","Mr Brightside","*R U Mine?","Chelsea Dagger","*505","*Fluorescent Adolescent","Last Nite","Take Me Out"],
+      "Mr Brightside is The Killers, Chelsea Dagger The Fratellis, Last Nite The Strokes and Take Me Out Franz Ferdinand."),
+    q("Pop every hit sung mainly in a language <em>other than English</em>", ["*Despacito","Barbie Girl","*Gangnam Style","*Du Hast","The Final Countdown","*La Bamba","*Non, je ne regrette rien","Dancing Queen","*Dragostea Din Tei"],
+      "Dragostea Din Tei is Romanian, by Moldova's O-Zone. You'll know it as the Numa Numa song."),
+    q("Pop everyone who was in <em>The Who</em>", ["*Roger Daltrey","Ray Davies","*Pete Townshend","Steve Marriott","*John Entwistle","Paul Weller","*Keith Moon","Rod Stewart","Eric Clapton"],
+      "Ray Davies fronted The Kinks, Steve Marriott the Small Faces and Paul Weller The Jam.") ],
+  // Day 17
+  [ q("Pop every <em>Madonna</em> song", ["*Like a Prayer","Girls Just Want to Have Fun","True Colors","*Vogue","Atomic","Time After Time","The Tide Is High","Heart of Glass","Call Me"],
+      "The rest are Cyndi Lauper and Blondie."),
+    q("Pop every song from a <em>Disney</em> film", ["*Let It Go","*Circle of Life","Defying Gravity","*Under the Sea","*A Whole New World","Memory","*How Far I'll Go","Mamma Mia","*Hakuna Matata"],
+      "Defying Gravity is from Wicked, Memory from Cats, and Mamma Mia from, well, Mamma Mia!"),
+    q("Pop everyone who was on the original <em>Band Aid</em> single in 1984", ["*Bono","Freddie Mercury","*George Michael","*Sting","*Boy George","Kylie Minogue","*Bananarama","*Phil Collins","*Status Quo"],
+      "Kylie was on Band Aid II in 1989. Queen weren't on it, but stole the show at Live Aid the next summer.") ],
+  // Day 18
+  [ q("Pop every musician who has been <em>knighted</em>", ["*Elton John","David Bowie","*Paul McCartney","Keith Richards","*Mick Jagger","Robbie Williams","*Rod Stewart","Ozzy Osbourne","*Tom Jones"],
+      "David Bowie turned down a knighthood in 2003."),
+    q("Pop everyone who was <em>never</em> in Girls Aloud", ["Cheryl","Nadine Coyle","*Mutya Buena","Sarah Harding","Nicola Roberts","*Frankie Bridge","Kimberley Walsh","*Kerry Katona","*Rochelle Humes"],
+      "Mutya was a Sugababe, Kerry was in Atomic Kitten, and Frankie and Rochelle were The Saturdays."),
+    q("Pop every song that <em>never</em> got to No.1 in the UK", ["*Wonderwall|Oasis","Don't Look Back in Anger|Oasis","*Common People|Pulp","*Song 2|Blur","Country House|Blur","Wannabe|Spice Girls","*Mr Brightside|The Killers","Bohemian Rhapsody|Queen","*Bitter Sweet Symphony|The Verve"],
+      "Wonderwall stalled at No.2, kept off the top by Robson & Jerome.") ],
+  // Day 19
+  [ q("Pop every <em>Stevie Wonder</em> song", ["*Superstition","*Isn't She Lovely","Ain't No Mountain High Enough","*Sir Duke","My Girl","*I Just Called to Say I Love You","What's Going On","*Signed, Sealed, Delivered","*Uptight (Everything's Alright)"],
+      "Ain't No Mountain High Enough is Marvin Gaye & Tammi Terrell, My Girl is The Temptations and What's Going On is Marvin Gaye."),
+    q("Pop every act that came <em>second</em> at Eurovision", ["*Sam Ryder","Loreen","*Verka Serduchka","Netta","*Käärijä","Alexander Rybak","*Baby Lasagna","Kalush Orchestra","Johnny Logan"],
+      "All the others won it. Johnny Logan won three times: twice as a singer, once as a songwriter."),
+    q("Pop every band named after a <em>song or a film</em>", ["*Radiohead","Oasis","*Black Sabbath","Kaiser Chiefs","*The Rolling Stones","UB40","*Duran Duran","Led Zeppelin","*Simple Minds"],
+      "Radiohead: a Talking Heads song. Black Sabbath: a horror film. The Stones: a Muddy Waters song. Duran Duran: a villain in Barbarella. Simple Minds: a Bowie lyric.") ],
+  // Day 20
+  [ q("Pop every <em>Taylor Swift</em> song", ["*Shake It Off","Bad Guy","*Love Story","Drivers License","*Blank Space","Levitating","*Anti-Hero","Flowers","*Cruel Summer"],
+      "Bad Guy is Billie Eilish, Drivers License is Olivia Rodrigo, Levitating is Dua Lipa and Flowers is Miley Cyrus."),
+    q("Pop every musical built from <em>existing pop hits</em>", ["*Mamma Mia!","Les Misérables","*We Will Rock You","*Jersey Boys","Hamilton","*MJ the Musical","*Tina","Wicked","*& Juliet"],
+      "& Juliet is built on songs by Swedish hitmaker Max Martin, from Britney to Katy Perry."),
+    q("Pop everyone who was in <em>Fleetwood Mac</em>", ["*Stevie Nicks","Debbie Harry","*Lindsey Buckingham","Chrissie Hynde","*Christine McVie","Pat Benatar","Grace Slick","Joan Jett","Annie Lennox"],
+      "Debbie Harry fronted Blondie, Chrissie Hynde The Pretenders, Grace Slick Jefferson Airplane and Annie Lennox Eurythmics.") ],
+  // Day 21
+  [ q("Pop every act that played <em>Woodstock</em> in 1969", ["*Jimi Hendrix","Bob Dylan","*The Who","The Doors","*Janis Joplin","Joni Mitchell","*Santana","Led Zeppelin","*Joe Cocker"],
+      "Joni Mitchell wrote the song Woodstock but missed the festival: her manager kept her away to do a TV show. Dylan lived nearby but didn't play."),
+    q("Pop every act from <em>Canada</em>", ["*Drake","Kylie Minogue","*Céline Dion","Sia","*Shania Twain","Lorde","*Avril Lavigne","Tame Impala","*Alanis Morissette"],
+      "Kylie, Sia and Tame Impala are Australian. Lorde is from New Zealand."),
+    q("Pop every act that has won the Grammy for <em>Album of the Year</em>", ["*Daft Punk","Rihanna","Ed Sheeran","Lady Gaga","*Billie Eilish","Ariana Grande","Katy Perry","Coldplay","Dua Lipa"],
+      "Daft Punk won in 2014 for Random Access Memories and Billie Eilish in 2020. None of the others has won it.") ],
+  // Day 22
+  [ q("Pop every <em>Amy Winehouse</em> song", ["*Rehab","Hello","*Back to Black","Someone Like You","*Tears Dry on Their Own","Make You Feel My Love","*You Know I'm No Good","Chasing Pavements","Mercy"],
+      "Mercy is Duffy. The other four are Adele."),
+    q("Pop every hit by a <em>Scandinavian</em> act", ["*Take On Me","99 Red Balloons","*It Must Have Been Love","*The Final Countdown","Boom, Boom, Boom, Boom!!","*Barbie Girl","*Levels","Rock Me Amadeus","*Lovefool"],
+      "a-ha are Norwegian and Aqua formed in Denmark. Roxette, Europe, Avicii and The Cardigans are Swedish. Nena's German, Vengaboys Dutch and Falco Austrian."),
+    q("Pop every song that was a <em>TV theme tune</em>", ["*I'll Be There for You","Unfinished Sympathy","*Woke Up This Morning","Under the Bridge","Iris","*Teardrop","Wonderwall","Creep","Bitter Sweet Symphony"],
+      "Friends, The Sopranos and House (in the US). The rest just sound like they should be.") ],
+  // Day 23
+  [ q("Pop every <em>Blur</em> song", ["*Parklife","Supersonic","*Song 2","Live Forever","*Girls & Boys","Champagne Supernova","*Coffee & TV","*Tender","*Beetlebum"],
+      "The other three are Oasis. Blur's Country House beat Oasis's Roll With It to No.1 in the Battle of Britpop, August 1995."),
+    q("Pop every star who went to the <em>BRIT School</em>", ["*Adele","Ed Sheeran","*Amy Winehouse","Harry Styles","*Jessie J","Lewis Capaldi","*Leona Lewis","Dua Lipa","*Raye"],
+      "Dua Lipa went to the Sylvia Young Theatre School instead."),
+    q("Pop every <em>Michael Jackson</em> album", ["*Thriller","Purple Rain","*Bad","Like a Virgin","*Off the Wall","Born in the U.S.A.","Back in Black","Rumours","Hotel California"],
+      "Purple Rain is Prince, Like a Virgin is Madonna, Born in the U.S.A. is Springsteen and Back in Black is AC/DC.") ],
+  // Day 24
+  [ q("Pop every <em>Prince</em> song", ["*Purple Rain","Billie Jean","*Kiss","Rock with You","*When Doves Cry","Beat It","Black or White","Smooth Criminal","Man in the Mirror"],
+      "The rest are Michael Jackson. The two were born less than three months apart, in the summer of 1958."),
+    q("Pop every act that has won the <em>Mercury Prize</em>", ["*Pulp","Oasis","*PJ Harvey","Coldplay","*Arctic Monkeys","Amy Winehouse","*Dave","Radiohead","*Little Simz"],
+      "Radiohead have been nominated several times but never won. PJ Harvey is the only act to win it twice."),
+    q("Pop everyone who has been a <em>Sugababe</em>", ["*Mutya Buena","Cheryl","*Keisha Buchanan","*Siobhán Donaghy","Nicola Roberts","*Heidi Range","*Amelle Berrabah","Geri Halliwell","*Jade Ewen"],
+      "By 2009 none of the original three were left. Heidi Range was briefly an early member of Atomic Kitten, too.") ],
+  // Day 25
+  [ q("Pop every <em>Lady Gaga</em> song", ["*Poker Face","Roar","*Bad Romance","Firework","*Just Dance","I Kissed a Girl","*Shallow","Chandelier","Teenage Dream"],
+      "Roar, Firework, I Kissed a Girl and Teenage Dream are Katy Perry. Chandelier is Sia."),
+    q("Pop every <em>bass player</em>", ["*Paul McCartney","Ringo Starr","*John Deacon","*Flea","Brian May","*Sting","*Krist Novoselic","Keith Moon","*Adam Clayton"],
+      "John Deacon played bass in Queen, Flea in Red Hot Chili Peppers, Krist Novoselic in Nirvana and Adam Clayton in U2."),
+    q("Pop every song released in the <em>1980s</em>", ["*Billie Jean","Wannabe","*Take On Me","Bohemian Rhapsody","Smells Like Teen Spirit","*Don't You Want Me","Dancing Queen","Hey Ya!","Wonderwall"],
+      "Smells Like Teen Spirit only just missed: 1991. Bohemian Rhapsody and Dancing Queen are from the 70s.") ],
+  // Day 26
+  [ q("Pop every act that won the Grammy for <em>Best New Artist</em>", ["*Adele","Taylor Swift","*Amy Winehouse","*Billie Eilish","Justin Bieber","*Dua Lipa","*The Beatles","Ed Sheeran","*Olivia Rodrigo"],
+      "Taylor Swift lost to Amy Winehouse in 2008, and Justin Bieber lost to jazz bassist Esperanza Spalding in 2011."),
+    q("Pop everyone who was <em>never</em> in Queen", ["Freddie Mercury","Brian May","*Robert Plant","Roger Taylor","*Ozzy Osbourne","John Deacon","*Bruce Dickinson","*Rod Stewart","*Phil Collins"],
+      "Robert Plant fronted Led Zeppelin, Ozzy Black Sabbath and Bruce Dickinson Iron Maiden."),
+    q("Pop every <em>Oasis</em> album", ["*Definitely Maybe","Parklife","*Be Here Now","The Great Escape","*Heathen Chemistry","Modern Life Is Rubbish","*Dig Out Your Soul","*Standing on the Shoulder of Giants","*Don't Believe the Truth"],
+      "Parklife, The Great Escape and Modern Life Is Rubbish are all Blur.") ],
+  // Day 27
+  [ q("Pop every <em>Fleetwood Mac</em> song", ["*Dreams","*Go Your Own Way","*Everywhere","*Landslide","*The Chain","Edge of Seventeen","Africa","Heart of Glass","Don't Dream It's Over"],
+      "Edge of Seventeen was Stevie Nicks going solo. Don't Dream It's Over is Crowded House."),
+    q("Pop every song released in the <em>1990s</em>", ["*Wannabe|Spice Girls","Hey Ya!|OutKast","*Wonderwall|Oasis","Toxic|Britney Spears","*Smells Like Teen Spirit|Nirvana","Crazy in Love|Beyoncé","*Barbie Girl|Aqua","*Torn|Natalie Imbruglia","*Gangsta's Paradise|Coolio"],
+      "Hey Ya!, Toxic and Crazy in Love came out in 2003 and 2004."),
+    q("Pop everyone who was <em>never</em> in One Direction", ["Harry Styles","*Olly Murs","Niall Horan","Liam Payne","*Lewis Capaldi","Louis Tomlinson","Zayn Malik","*Aston Merrygold","*Shawn Mendes"],
+      "Aston Merrygold was in JLS. Olly Murs came second on The X Factor the year before 1D were put together.") ],
+  // Day 28
+  [ q("Pop every <em>Britney Spears</em> song", ["*Toxic","Genie in a Bottle","Fighter","*...Baby One More Time","Dirrty","Beautiful","What a Girl Wants","Candyman","Come On Over Baby"],
+      "The other seven are all Christina Aguilera."),
+    q("Pop every band from <em>Greater Manchester</em>", ["*The Smiths","The Beatles","*The Stone Roses","*Joy Division","*Oasis","Echo & the Bunnymen","*Take That","*Happy Mondays","*Simply Red"],
+      "The Beatles and Echo & the Bunnymen are from Liverpool."),
+    q("Pop everyone who was in <em>Pink Floyd</em>", ["*Roger Waters","Robert Plant","*David Gilmour","Jimmy Page","*Nick Mason","Rick Wakeman","*Syd Barrett","Peter Gabriel","*Richard Wright"],
+      "Robert Plant and Jimmy Page were Led Zeppelin, Rick Wakeman was in Yes and Peter Gabriel fronted Genesis.") ],
+  // Day 29
+  [ q("Pop every song by <em>The Weeknd</em>", ["*Blinding Lights","Hotline Bling","*Starboy","God's Plan","One Dance","*Save Your Tears","Sorry","Peaches","Baby"],
+      "All Canadians: the rest are Drake and Justin Bieber."),
+    q("Pop every song from <em>Grease</em>", ["*You're the One That I Want","Time Warp","*Summer Nights","Don't Rain on My Parade","*Greased Lightnin'","Fame","*Hopelessly Devoted to You","Don't Stop Believin'","*Beauty School Dropout"],
+      "Time Warp is from The Rocky Horror Show, Fame from Fame and Don't Rain on My Parade from Funny Girl."),
+    q("Pop every song <em>Dolly Parton</em> wrote", ["*Jolene","Islands in the Stream","*9 to 5","Stand by Your Man","*I Will Always Love You","Crazy","*Coat of Many Colors","Ring of Fire","Here You Come Again"],
+      "She wrote Jolene and I Will Always Love You on the same day. Islands in the Stream was written by the Bee Gees.") ],
+  // Day 30
+  [ q("Pop every <em>Daft Punk</em> song", ["*One More Time","Music Sounds Better with You","*Get Lucky","*Around the World","Sandstorm","*Harder, Better, Faster, Stronger","Lady (Hear Me Tonight)","*Digital Love","Groovejet"],
+      "Music Sounds Better with You was Stardust, a side project of Daft Punk's Thomas Bangalter. Sandstorm is Darude, from Finland."),
+    q("Pop everyone who was in <em>ABBA</em>", ["*Agnetha Fältskog","Björk","*Björn Ulvaeus","Robyn","*Benny Andersson","Zara Larsson","*Anni-Frid Lyngstad","Tove Lo","Max Martin"],
+      "Anni-Frid was born in Norway. Björk is Icelandic, and Max Martin is the Swedish songwriter behind hits for Britney, Taylor and The Weeknd."),
+    q("Pop every <em>Beyoncé</em> album", ["*Lemonade","Anti","*Renaissance","Sweetener","*Cowboy Carter","Chromatica","*Dangerously in Love","*4","*B'Day"],
+      "Anti is Rihanna, Sweetener is Ariana Grande and Chromatica is Lady Gaga.") ]
+];
+
+const GOOD_WORDS = ['POP!','POP!','BOP!','PLINK!','POP!'];
+const ROUND_LINES = {
+  9:['Flawless popping!','Every bubble, spot on.','Perfect round!'],
+  high:['Nicely popped.','So close to perfect.','Sharp ears!'],
+  mid:['Not bad at all.','Half popped, half not.','Some fizz, some flat.'],
+  low:['Bit of a soapy mess.','That one burst your bubble.','Ouch. Next round!']
+};
+
+/* ================= Helpers ================= */
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+};
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function esc(t){ return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
+const plain = html => html.replace(/<[^>]+>/g,'');
+
+function londonNow(){
+  const o={};
+  new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(Date.now()-RESET_HOUR*3600e3)).forEach(p=>o[p.type]=p.value);
+  return o;
+}
+function dayNumber(){
+  const o=londonNow(), [y,m,d]=LAUNCH.split('-').map(Number);
+  return Math.max(1, Math.round((Date.UTC(+o.year,+o.month-1,+o.day)-Date.UTC(y,m-1,d))/864e5)+1);
+}
+function secondsToNext(){ const o=londonNow(); return 86400-(+o.hour*3600 + +o.minute*60 + +o.second); }
+function hms(s){ return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,'0')).join(':'); }
+function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+/* ================= State ================= */
+const DAY = dayNumber();
+const TODAY = DAYS[(DAY-1)%DAYS.length];
+let S;
+
+/* Bubbles are shuffled into the same order for everyone on the day */
+function order(r){
+  const g=rng(DAY*97+r*13+7), a=[...Array(PER_ROUND).keys()];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(g()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function freshState(){ return {day:DAY, idx:0, popped:[], stage:'play', codes:[]}; }
+function loadState(){ try{ const s=JSON.parse(store.get('pq-state-v3')); if(s && s.day===DAY) return s; }catch(e){} return freshState(); }
+function save(){ store.set('pq-state-v3',JSON.stringify(S)); }
+function loadStats(){ try{ return JSON.parse(store.get('pq-stats-v3')) || {}; }catch(e){ return {}; } }
+function recordStats(){
+  const st=Object.assign({played:0,streak:0,best:0,lastDay:0,total:0,top:0,dist:[0,0,0,0]},loadStats());
+  if(st.lastDay===DAY) return;
+  st.dist[perfectRounds()]++;
+  st.played++; st.streak = st.lastDay===DAY-1 ? st.streak+1 : 1;
+  st.best=Math.max(st.best,st.streak); st.lastDay=DAY; st.total+=totalScore(); st.top=Math.max(st.top,totalScore());
+  store.set('pq-stats-v3',JSON.stringify(st));
+}
+
+const round = () => TODAY[S.idx];
+const wrongPops = () => S.popped.filter(i=>!round().items[i].target).length;
+
+/* Code per bubble, in grid order: g = popped right, k = rightly left, b = wrong pop, m = missed */
+function roundCode(r, popped){
+  return order(r).map(i=>{ const it=TODAY[r].items[i], p=popped.includes(i);
+    return it.target ? (p?'g':'m') : (p?'b':'k'); }).join('');
+}
+const count = (c,ch) => [...c].filter(x=>x===ch).length;
+const codeScore = c => count(c,'g') + count(c,'k');            // a point for every bubble you got right
+const totalScore = () => S.codes.reduce((t,c)=>t+codeScore(c),0);
+const perfectRounds = () => S.codes.filter(c=>codeScore(c)===PER_ROUND).length;
+
+/* ================= Rendering ================= */
+function renderStatus(){
+  const used=S.stage==='play'?wrongPops():0;
+  $('lives').innerHTML=[...Array(LIVES).keys()].map(n=>`<span class="pip${n<used?' lost':''}"></span>`).join('');
+  $('score').textContent=totalScore();
+  $('round').textContent=`Round ${S.idx+1} of ${PER_DAY}`;
+  $('level').textContent=LEVELS[S.idx]||'';
+}
+function setFeedback(msg,type=''){ $('feedback').textContent=msg; $('feedback').className='feedback '+type; }
+
+function bubbleHTML(i){
+  const it=round().items[i], len=it.title.length+it.artist.length*.6;
+  const size = /^[\d÷×]+$/.test(it.title) ? ' big' : len>22 ? ' xs' : '';
+  const t=4+((i*37)%17)/10, dl=-((i*53)%40)/10;
+  return `<button class="bubble${size}" data-i="${i}" style="--t:${t}s;--dl:${dl}s" aria-label="${esc(it.title+(it.artist?' by '+it.artist:''))}">
+    <span class="skin" aria-hidden="true"></span>
+    <span class="t">${esc(it.title)}${it.artist?`<span class="a">${esc(it.artist)}</span>`:''}</span></button>`;
+}
+function renderRound(){
+  $('question').innerHTML=round().question;
+  $('grid').innerHTML=order(S.idx).map(bubbleHTML).join('');
+  S.popped.forEach(i=>markPopped(i,true));
+  ['fact','legend','next-btn'].forEach(id=>$(id).classList.add('hidden'));
+  $('done-btn').classList.remove('hidden'); $('hint').classList.remove('hidden'); setFeedback('');
+  renderStatus();
+  if(S.stage==='review') review(true);
+}
+function bubbleEl(i){ return $('grid').querySelector(`.bubble[data-i="${i}"]`); }
+function markPopped(i,instant){
+  const el=bubbleEl(i), bad=!round().items[i].target;
+  el.classList.add('gone'); if(bad) el.classList.add('bad');
+  el.disabled=true;
+  if(instant){ const sk=el.querySelector('.skin'); sk.style.animation='none'; sk.style.opacity='0'; }
+}
+/* ================= Pop effects ================= */
+function burst(el,good){
+  if(reduceMotion) return;
+  const tank=$('tank').getBoundingClientRect(), r=el.getBoundingClientRect();
+  const fx=document.createElement('div'); fx.className='fx';
+  fx.style.left=(r.left-tank.left+r.width/2)+'px'; fx.style.top=(r.top-tank.top+r.height/2)+'px';
+  const cols = good ? ['#7dd3fc','#c4b5fd','#f472b6','#5eead4','#ffffff'] : ['#fb7185','#f43f5e','#fda4af'];
+  let html=`<span class="ring" style="--c:${good?'#c4f1ff':'#fb7185'}"></span>`;
+  const n = good?14:9;
+  for(let k=0;k<n;k++){
+    const a=(360/n)*k+Math.random()*16, d=(good?46:30)+Math.random()*(good?34:18), s=4+Math.random()*(good?7:9);
+    html+=`<span class="drop" style="--a:${a}deg;--d:${d}px;--s:${s}px;--c:${cols[k%cols.length]}"></span>`;
+  }
+  html+=`<span class="word" style="--c:${good?'#fde68a':'#fb7185'}">${good?pick(GOOD_WORDS):'SPLAT!'}</span>`;
+  fx.innerHTML=html; $('tank').appendChild(fx);
+  setTimeout(()=>fx.remove(),800);
+}
+
+/* ================= Haptics =================
+   Android (and most non-Apple phones): the Vibration API, with a different buzz for each event.
+   iPhone: Safari has no Vibration API, but since iOS 18 flicking a native switch gives a light tick,
+   so a hidden switch is toggled on each pop. iPhones only get the tick, not patterns. */
+let hapticsOn = store.get('pq-haptics')!=='off';
+const canVibrate = typeof navigator.vibrate==='function';
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const PATTERNS = { pop:14, splat:[35,40,35], out:[60,40,60,40,120], perfect:[15,50,15,50,40], tap:8 };
+function haptic(kind){
+  if(!hapticsOn) return;
+  if(canVibrate){ try{ navigator.vibrate(PATTERNS[kind]||10); }catch(e){} return; }
+  if(isIOS){
+    const tickIOS=()=>{ try{ $('hap').click(); }catch(e){} };
+    tickIOS();
+    if(kind==='splat'||kind==='perfect'||kind==='out') setTimeout(tickIOS,90);   // a second tick, if iOS allows it
+  }
+}
+
+/* ================= Sound =================
+   All synthesised in the browser: no audio files to load. */
+let soundOn = store.get('pq-sound')!=='off', actx=null, noiseBuf=null;
+function ac(){
+  if(!soundOn) return null;
+  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); }catch(e){ return null; }
+  return actx;
+}
+function beep(freq,dur,type='sine',gain=.04,delay=0,slideTo){
+  const c=ac(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain(), t=c.currentTime+delay;
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(gain,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+dur+.02);
+}
+function noise(dur,gain=.05,delay=0,from=800,to=3000,q=.8){
+  const c=ac(); if(!c) return;
+  if(!noiseBuf){ noiseBuf=c.createBuffer(1,c.sampleRate,c.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  const src=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain(), t=c.currentTime+delay;
+  src.buffer=noiseBuf; f.type='bandpass'; f.Q.value=q;
+  f.frequency.setValueAtTime(from,t); f.frequency.exponentialRampToValueAtTime(to,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(gain,t+.003); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  src.connect(f); f.connect(g); g.connect(c.destination); src.start(t); src.stop(t+dur+.05);
+}
+let popCount=0;
+const sfx = {
+  // a real-sounding pop: a click of noise plus a quick falling "bloop", a little higher each time
+  pop:    ()=>{ const up=Math.min(popCount++,6)*60; noise(.05,.14,0,2600,900,1.4); beep(520+up,.09,'sine',.12,0,140); },
+  splat:  ()=>{ noise(.22,.12,0,900,180,.9); beep(180,.25,'square',.04,0,70); },
+  out:    ()=> [392,370,349,330].forEach((f,i)=>beep(f,i===3?.6:.25,'sawtooth',.03,i*.25,i===3?280:undefined)),
+  done:   ()=> [660,880].forEach((f,i)=>beep(f,.18,'triangle',.05,i*.09)),
+  perfect:()=> [523,659,784,1047,1319].forEach((f,i)=>beep(f,.22,'triangle',.05,i*.07)),
+  meh:    ()=> [440,370].forEach((f,i)=>beep(f,.25,'triangle',.04,i*.15)),
+  tap:    ()=> beep(1200,.03,'sine',.03)
+};
+const SPEAKER='<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/>';
+function paintSound(){
+  $('sound-btn').innerHTML = SPEAKER + (soundOn ? '<path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>' : '<path d="M17 9l5 6M22 9l-5 6"/></svg>');
+  $('sound-btn').setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off');
+  $('sound-btn').setAttribute('aria-pressed', soundOn);
+}
+
+/* ================= Game flow ================= */
+function popBubble(i){
+  if(S.stage!=='play' || S.popped.includes(i)) return;
+  const el=bubbleEl(i), good=round().items[i].target;
+  S.popped.push(i); save();
+  burst(el,good); markPopped(i);
+  if(good){ sfx.pop(); haptic('pop'); setFeedback(''); renderStatus(); return; }
+  sfx.splat(); haptic('splat');
+  $('tank').classList.remove('shake'); void $('tank').offsetWidth; $('tank').classList.add('shake');
+  renderStatus();
+  const left=LIVES-wrongPops();
+  if(left<=0){ setFeedback("Out of lives. That's the round.",'bad'); setTimeout(()=>{ sfx.out(); haptic('out'); endRound(); },650); return; }
+  setFeedback(left===1 ? "Splat! That one should've stayed. Last life." : "Splat! That one should've stayed.",'bad');
+}
+
+function endRound(){
+  if(S.stage!=='play') return;
+  S.codes.push(roundCode(S.idx,S.popped)); S.stage='review'; save();
+  review(false);
+}
+
+/* Show the answers: a tag on every bubble you got right or wrong; missed ones wobble */
+function review(instant){
+  const code=S.codes[S.idx], pts=codeScore(code), ord=order(S.idx);
+  $('done-btn').classList.add('hidden'); $('hint').classList.add('hidden');
+  ord.forEach((i,p)=>{
+    const el=bubbleEl(i), c=code[p]; el.disabled=true;
+    const tag = c==='g'?'<span class="tag ok">✓</span>' : c==='b'?'<span class="tag no">✗</span>' : c==='m'?'<span class="tag mi">!</span>' : '';
+    if(c==='m') el.classList.add('missed');
+    if(c==='k') el.classList.add('kept');
+    if(tag) el.insertAdjacentHTML('beforeend',tag);
+  });
+  const missed=count(code,'m'), bad=count(code,'b');
+  const line = pts===9 ? pick(ROUND_LINES[9]) : pts>=7 ? pick(ROUND_LINES.high) : pts>=5 ? pick(ROUND_LINES.mid) : pick(ROUND_LINES.low);
+  const bits=[]; if(missed) bits.push(`missed ${missed}`); if(bad) bits.push(`${bad} wrong pop${bad>1?'s':''}`);
+  setFeedback(`${line} ${pts}/9${bits.length?' · '+bits.join(', '):''}`, pts===9?'good':pts>=5?'mid':'bad');
+  if(!instant){ if(pts===9){ sfx.perfect(); haptic('perfect'); } else if(pts>=5) sfx.done(); else sfx.meh(); }
+  const rd=round();
+  if(rd.fact){ $('fact').textContent=rd.fact; $('fact').classList.remove('hidden'); }
+  $('legend').classList.remove('hidden');
+  renderStatus();
+  const last=S.idx>=PER_DAY-1, nb=$('next-btn');
+  nb.textContent = last ? 'See results' : 'Next round'; nb.classList.remove('hidden');
+  if(!instant) nb.focus({preventScroll:true});
+}
+
+function nextRound(){
+  if(S.idx>=PER_DAY-1){ finish(); return; }
+  S.idx++; S.popped=[]; S.stage='play'; popCount=0; save();
+  $('play').classList.remove('fade-in'); void $('play').offsetWidth; $('play').classList.add('fade-in');
+  renderRound(); window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
+}
+function finish(){ S.stage='done'; save(); recordStats(); showEnd(); }
+
+function verdict(){
+  const s=totalScore();
+  return s===27 ? 'Bubble wrap legend' : s>=24 ? 'Top of the pops' : s>=19 ? "Poppin' off" : s>=13 ? 'Bit of fizz' : 'Bubble trouble';
+}
+const EMO={g:'🟢',k:'⚪',b:'🔴',m:'🟡'};
+function shareGrid(){
+  // three 3×3 grids side by side, one per round
+  return [0,1,2].map(row=>S.codes.map(c=>[...c.slice(row*3,row*3+3)].map(x=>EMO[x]).join('')).join(' ')).join('\n');
+}
+function shareText(){ return `🫧 Pop Quiz #${DAY}: ${totalScore()}/27\n${shareGrid()}\n${SITE_URL}`; }
+
+function showEnd(){
+  $('play').classList.add('hidden'); $('end').classList.remove('hidden');
+  $('end-stamp').textContent=`Quiz No. ${DAY}`;
+  $('end-title').textContent=verdict();
+  $('end-score').textContent=totalScore();
+  $('minis').innerHTML=S.codes.map((c,r)=>`<div><div class="mini">${[...c].map(x=>`<i class="c-${x}"></i>`).join('')}</div><div class="mini-l">R${r+1} · ${codeScore(c)}/9</div></div>`).join('');
+  $('recap').innerHTML=TODAY.map((rd,r)=>{
+    const pops=rd.items.filter(it=>it.target).map(it=>it.title).join(', ');
+    return `<li><span class="rs">${codeScore(S.codes[r]||'')}/9</span><div class="rq">${esc(plain(rd.question))}</div>
+      <div class="ra"><b>Pop:</b> ${esc(pops)}</div>${rd.fact?`<div class="rnote">${esc(rd.fact)}</div>`:''}</li>`;
+  }).join('');
+}
+
+/* ================= Sharing ================= */
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+async function copyResult(){
+  const t=shareText();
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){} ta.remove(); }
+  toast('Copied to clipboard');
+}
+const roundF="'Fredoka','DM Sans',system-ui,sans-serif", mono="'DM Mono',monospace", sansF="'DM Sans',system-ui,sans-serif";
+async function loadFonts(){ try{ await Promise.all(["700 120px Fredoka","600 40px Fredoka","500 30px 'DM Mono'","500 30px 'DM Sans'"].map(f=>document.fonts.load(f))); }catch(e){} }
+function drawBubble(x,cx,cy,r){
+  const g=x.createRadialGradient(cx,cy,r*.5,cx,cy,r);
+  g.addColorStop(0,'rgba(10,13,29,0)'); g.addColorStop(.75,'rgba(125,211,252,.18)'); g.addColorStop(1,'rgba(244,114,182,.55)');
+  x.fillStyle=g; x.beginPath(); x.arc(cx,cy,r,0,7); x.fill();
+  x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=Math.max(1.5,r*.05); x.stroke();
+  x.fillStyle='rgba(255,255,255,.85)'; x.beginPath(); x.ellipse(cx-r*.38,cy-r*.42,r*.2,r*.11,-.6,0,7); x.fill();
+}
+function bubbleBackdrop(x,W,H){
+  x.fillStyle='#0a0d1d'; x.fillRect(0,0,W,H);
+  let g=x.createRadialGradient(W*.2,0,0,W*.2,0,W*.9); g.addColorStop(0,'rgba(125,211,252,.28)'); g.addColorStop(1,'rgba(125,211,252,0)'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(W*.85,0,0,W*.85,0,W*.9); g.addColorStop(0,'rgba(244,114,182,.28)'); g.addColorStop(1,'rgba(244,114,182,0)'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const r=rng(42); for(let k=0;k<26;k++){ const cx=r()*W, cy=r()*H, rad=6+r()*36; x.globalAlpha=.25+r()*.25; drawBubble(x,cx,cy,rad); } x.globalAlpha=1;
+}
+function centreText(x,W,t,y,font,fill,ls){ x.font=font; x.fillStyle=fill; x.textAlign='center'; if('letterSpacing' in x) x.letterSpacing=ls||'0px'; x.fillText(t,W/2,y); if('letterSpacing' in x) x.letterSpacing='0px'; }
+function gradText(x,W,t,y,font,stops){ x.font=font; const w=x.measureText(t).width, g=x.createLinearGradient(W/2-w/2,0,W/2+w/2,0);
+  (stops||[[0,'#7dd3fc'],[.45,'#c4b5fd'],[1,'#f472b6']]).forEach(([o,c])=>g.addColorStop(o,c)); centreText(x,W,t,y,font,g); }
+function rrect(x,a,b,w,h,r){ x.beginPath(); if(x.roundRect) x.roundRect(a,b,w,h,r); else x.rect(a,b,w,h); }
+async function drawShare(){
+  await loadFonts();
+  const W=1080,H=1350,c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  bubbleBackdrop(x,W,H);
+  rrect(x,90,110,W-180,H-220,48); x.fillStyle='rgba(22,26,51,.9)'; x.fill(); x.strokeStyle='rgba(125,211,252,.3)'; x.lineWidth=2.5; x.stroke();
+  centreText(x,W,`QUIZ NO. ${DAY}`,210,`500 30px ${mono}`,'#5eead4','10px');
+  gradText(x,W,'Pop Quiz',330,`700 128px ${roundF}`);
+  centreText(x,W,verdict(),430,`600 56px ${roundF}`,'#f4f6ff');
+  gradText(x,W,String(totalScore()),620,`700 190px ${roundF}`);
+  centreText(x,W,'OUT OF 27',680,`500 30px ${mono}`,'#9aa3c7','6px');
+  const col={g:'#5eead4',k:'rgba(255,255,255,.14)',b:'#fb7185',m:'#fbbf24'};
+  const cell=46, gap=12, gw=cell*3+gap*2, gg=56, total=gw*3+gg*2, sx=W/2-total/2;
+  S.codes.forEach((code,r)=>{
+    const ox=sx+r*(gw+gg), oy=760;
+    [...code].forEach((ch,p)=>{ const cx=ox+(p%3)*(cell+gap)+cell/2, cy=oy+Math.floor(p/3)*(cell+gap)+cell/2;
+      x.fillStyle=col[ch]; x.beginPath(); x.arc(cx,cy,cell/2,0,7); x.fill();
+      x.fillStyle='rgba(255,255,255,.6)'; x.beginPath(); x.ellipse(cx-cell*.17,cy-cell*.2,cell*.1,cell*.06,-.6,0,7); x.fill(); });
+    x.font=`500 26px ${mono}`; x.fillStyle='#9aa3c7'; x.textAlign='center'; x.fillText(`R${r+1} · ${codeScore(code)}/9`, ox+gw/2, oy+gw+46);
+  });
+  const inv='Can you pop better?'; x.font=`600 42px ${roundF}`; const iw=x.measureText(inv).width+90;
+  rrect(x,W/2-iw/2,1085,iw,84,42); x.fillStyle='#20254a'; x.fill(); x.strokeStyle='rgba(244,114,182,.45)'; x.lineWidth=2; x.stroke();
+  centreText(x,W,inv,1140,`600 42px ${roundF}`,'#f4f6ff');
+  centreText(x,W,SITE_URL.replace(/^https?:\/\//,'').replace(/\/$/,''),1205,`400 26px ${mono}`,'#9aa3c7');
+  return c;
+}
+async function shareImage(){
+  const c=await drawShare(), blob=await new Promise(r=>c.toBlob(r,'image/png'));
+  const file=new File([blob],`pop-quiz-${DAY}.png`,{type:'image/png'});
+  try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], text:shareText()}); return; } }
+  catch(e){ if(e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=file.name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('Image saved');
+}
+
+function openStats(){
+  const st=Object.assign({played:0,streak:0,best:0,lastDay:0,total:0,top:0},loadStats());
+  const alive = st.lastDay>=DAY-1 ? st.streak : 0;   // a missed day breaks the streak
+  $('st-played').textContent=st.played; $('st-streak').textContent=alive; $('st-best').textContent=st.best;
+  $('st-avg').textContent= st.played ? Math.round(st.total/st.played) : 0; $('st-top').textContent=st.top;
+  const dist=st.dist||[0,0,0,0], mx=Math.max(1,...dist), today=S.stage==='done'?perfectRounds():-1;
+  $('dist').innerHTML=dist.map((v,i)=>`<div class="dbar"><span>${i}</span><i class="${i===today?'hl':''}" style="width:${Math.max(8,v/mx*90)}%">${v}</i></div>`).join('');
+  $('stats').showModal();
+}
+function tick(){
+  const s=secondsToNext();
+  $('countdown').textContent=hms(s); $('st-countdown').textContent=hms(s);
+  if(s<=1) setTimeout(()=>location.reload(),1500);
+}
+
+/* ================= Events & start ================= */
+$('grid').addEventListener('click',e=>{ const el=e.target.closest('.bubble'); if(el&&!el.disabled) popBubble(+el.dataset.i); });
+$('done-btn').addEventListener('click',()=>{ if(S.stage==='play'){ sfx.tap(); haptic('tap'); endRound(); } });
+$('next-btn').addEventListener('click',()=>{ haptic('tap'); nextRound(); });
+$('share-img').addEventListener('click',()=>{ sfx.tap(); shareImage(); });
+$('copy-btn').addEventListener('click',()=>{ sfx.tap(); copyResult(); });
+$('sound-btn').addEventListener('click',()=>{ soundOn=!soundOn; store.set('pq-sound',soundOn?'on':'off'); paintSound(); if(soundOn) sfx.tap(); });
+$('stats-btn').addEventListener('click',openStats);
+$('help-btn').addEventListener('click',()=>$('help').showModal());
+$('help-close').addEventListener('click',()=>$('help').close());
+$('haptics-opt').checked=hapticsOn;
+$('haptics-opt').addEventListener('change',e=>{ hapticsOn=e.target.checked; store.set('pq-haptics',hapticsOn?'on':'off'); haptic('pop'); });
+if(!canVibrate && !isIOS) $('haptics-row').classList.add('hidden');   // desktop: nothing to vibrate
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{ if(e.target===d||e.target.closest('[data-close]')) d.close(); }));
+
+S = loadState();
+paintSound();
+$('kicker').textContent = `Quiz No. ${DAY}`;
+tick(); setInterval(tick,1000);
+if(S.stage==='done') showEnd();
+else { $('play').classList.remove('hidden'); renderRound(); }
+if(!store.get('pq-seen-help')){ $('help').showModal(); store.set('pq-seen-help','1'); }
+</script>
+<script src="https://playpuzzl.com/nav.js"></script>
+</body>
+</html>
