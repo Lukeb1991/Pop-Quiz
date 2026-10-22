@@ -9,7 +9,7 @@
 <!-- Link previews (WhatsApp, iMessage, socials). Swap the domain for your live address. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Puzzl">
-<meta property="og:title" content="Pop Quiz – pop the right bubbles">
+<meta property="og:title" content="Pop Quiz · Pop the flops. Keep the hits.">
 <meta property="og:description" content="Nine bubbles, one music question. Pop the right ones, but you never know how many.">
 <meta property="og:url" content="https://playpuzzl.com/Pop-Quiz/">
 <meta property="og:image" content="https://playpuzzl.com/Pop-Quiz/og-image.png">
@@ -226,7 +226,7 @@ dialog p strong{color:var(--text)}
 <main class="app">
   <div class="top">
     <button class="icon" id="help-btn" aria-label="How to play">?</button>
-    <span class="kicker" id="kicker">Quiz No. 1</span>
+    <span class="kicker" id="kicker">Track No. 1</span>
     <div class="r">
       <button class="icon" id="sound-btn" aria-label="Sound on" aria-pressed="true"></button>
       <button class="icon" id="stats-btn" aria-label="Your stats"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="8" width="3" height="7" rx="1"/><rect x="6.5" y="4" width="3" height="11" rx="1"/><rect x="12" y="1" width="3" height="14" rx="1"/></svg></button>
@@ -244,7 +244,7 @@ dialog p strong{color:var(--text)}
     </svg>
   </div>
   <h1>Pop Quiz</h1>
-  <p class="sub">Pop the right bubbles. But how many?</p>
+  <p class="sub">Pop the flops. Keep the hits.</p>
 
   <section id="play" class="hidden">
     <div class="status">
@@ -273,7 +273,7 @@ dialog p strong{color:var(--text)}
   </section>
 
   <section id="end" class="end hidden">
-    <div class="stamp" id="end-stamp">Quiz No. 1</div>
+    <div class="stamp" id="end-stamp">Track No. 1</div>
     <h2 id="end-title">Bubble trouble</h2>
     <div class="end-score" id="end-score">0</div>
     <p class="end-sub">out of 27</p>
@@ -805,7 +805,7 @@ function shareText(){ return `🫧 Pop Quiz #${DAY}: ${totalScore()}/27\n${share
 
 function showEnd(){
   $('play').classList.add('hidden'); $('end').classList.remove('hidden');
-  $('end-stamp').textContent=`Quiz No. ${DAY}`;
+  $('end-stamp').textContent=`Track No. ${DAY}`;
   $('end-title').textContent=verdict();
   $('end-score').textContent=totalScore();
   $('minis').innerHTML=S.codes.map((c,r)=>`<div><div class="mini">${[...c].map(x=>`<i class="c-${x}"></i>`).join('')}</div><div class="mini-l">R${r+1} · ${codeScore(c)}/9</div></div>`).join('');
@@ -909,7 +909,7 @@ document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{ i
 
 S = loadState();
 paintSound();
-$('kicker').textContent = `Quiz No. ${DAY}`;
+$('kicker').textContent = `Track No. ${DAY}`;
 tick(); setInterval(tick,1000);
 if(S.stage==='done') showEnd();
 else { $('play').classList.remove('hidden'); renderRound(); }
